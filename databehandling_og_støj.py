@@ -149,3 +149,8 @@ plt.legend(title="Stress Level")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+
+# Save the modified dataset to a new CSV file
+student_dataset.to_csv("student_lifestyle_dataset_modifceret.csv", index=False)
+
+print("\n--- New dataset saved as 'student_lifestyle_dataset_modified.csv' ---")
