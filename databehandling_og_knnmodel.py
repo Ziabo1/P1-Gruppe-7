@@ -12,7 +12,7 @@ from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 #Indlæs datasættet
 #Info på data og kontrol af felter med null
-student_dataset = pd.read_csv("student_lifestyle_dataset.csv")
+student_dataset = pd.read_csv("student_lifestyle_dataset_modificeret.csv")
 print("\n--- INFO ---")
 print(student_dataset.info())
 
@@ -64,10 +64,6 @@ sns.heatmap(student_dataset[numeric_cols].corr(), annot=True, cmap="coolwarm")
 plt.title("Correlation Heatmap")
 plt.show()
 
-
-
-#dropna på student ID
-student_dataset = student_dataset.drop(columns=["Student_ID"])
 
 #ordinal encode stress niveau
 ord_encoder = OrdinalEncoder(categories=[["Low", "Moderate", "High"]])
