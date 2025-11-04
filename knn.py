@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 
 # --- Data Preparation ---
 def DataPrep():
-    data = pd.read_csv('student_lifestyle_dataset_modificeret.csv')
+    data = pd.read_csv('student_lifestyle_dataset_modifceret.csv')
     data.dropna(inplace=True)
     ordenc = OrdinalEncoder(categories=[['Low', 'Moderate', 'High']])
     data['Stress_Level'] = (ordenc.fit_transform(data[['Stress_Level']]) + 1).astype(int)
