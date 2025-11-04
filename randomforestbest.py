@@ -35,6 +35,8 @@ def RFOptim(X_train, y_train):
     }
     random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1)
     random_search.fit(X_train, y_train)
+    print(f'Best parameters found: {random_search.best_params_}')
+    print(f'Best cross-validation score: {random_search.best_score_:.4f}')
     return random_search.best_estimator_
 def RFBest(X_train, y_train):
     rf = RFOptim(X_train, y_train)
@@ -43,7 +45,18 @@ def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = RFBest(X_train, y_train)
     scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42))
+    importance = best_model.feature_importances_
     print(f'Cross-validation scores(RF): {scores}')
     print(f'Mean cross-validation score(RF): {scores.mean():.4f}')
+    feature_importance_df = pd.DataFrame({
+    'Feature': X_train.columns,
+    'Importance': importance
+    }).sort_values('Importance', ascending=False)
+    plt.figure(figsize=(8, 5))
+    plt.barh(feature_importance_df['Feature'], feature_importance_df['Importance'])
+    plt.gca().invert_yaxis()  # highest importance at top
+    plt.xlabel('Feature Importance')
+    plt.title('Random Forest Feature Importance')
+    plt.show()
 # Evaluate the model
 
