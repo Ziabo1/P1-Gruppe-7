@@ -10,23 +10,40 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GridSearchCV
 
 # Read data
-data = pd.read_csv('student_lifestyle_dataset_modifceret.csv')
-data.dropna(inplace=True) 
-ordenc = OrdinalEncoder(categories=[['Low', 'Moderate', 'High']])
-data['Stress_Level'] = ordenc.fit_transform(data[['Stress_Level']]) + 1
-#print(data.corr()['Stress_Level'].sort_values(ascending=False))
-
-X = data.drop(columns=['Stress_Level'])
-# X = data[['Study_Hours_Per_Day', 'Extracurricular_Hours_Per_Day', 'Sleep_Hours_Per_Day', 'Social_Hours_Per_Day', 'Physical_Activity_Hours_Per_Day', 'GPA']].values
-y = data['Stress_Level']
+def DataPrep():
+    data = pd.read_csv('student_lifestyle_dataset_modificeret.csv')
+    data.dropna(inplace=True) 
+    ordenc = OrdinalEncoder(categories=[['Low', 'Moderate', 'High']])
+    data['Stress_Level'] = (ordenc.fit_transform(data[['Stress_Level']]) + 1).astype(int)
+    X = data.drop(columns=['Stress_Level'])
+    y = data['Stress_Level']
+    return X, y
 
 #print(data.head())
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+def Split():
+    X, y = DataPrep()
+    return train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 # Create and train the model
-best_model = RandomForestClassifier(n_estimators=450, max_depth=None, min_samples_split=20, min_samples_leaf=3, max_features='sqrt', bootstrap=True, random_state=42)
-scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42))
-
-best_model.fit(X_train, y_train)
+def RFOptim(X_train, y_train):
+    param = {
+        'n_estimators': [100, 200, 300, 400, 500],
+        'max_depth': [None, 10, 20, 30],
+        'min_samples_split': [2, 5, 10],
+        'min_samples_leaf': [1, 2, 4],
+        'max_features': [None, 'sqrt', 'log2'],
+        'bootstrap': [True, False]
+    }
+    random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1)
+    random_search.fit(X_train, y_train)
+    return random_search.best_estimator_
+def RFBest(X_train, y_train):
+    rf = RFOptim(X_train, y_train)
+    return rf
+def Validate():
+    X_train, X_test, y_train, y_test = Split()
+    best_model = RFBest(X_train, y_train)
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42))
+    print(f'Cross-validation scores(RF): {scores}')
+    print(f'Mean cross-validation score(RF): {scores.mean():.4f}')
 # Evaluate the model
-print(f'Cross-validation scores: {scores}')
-print(f'Mean cross-validation score: {scores.mean()}')
+
