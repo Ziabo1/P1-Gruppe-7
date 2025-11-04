@@ -4,7 +4,9 @@ from sklearn.preprocessing import OrdinalEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score, KFold
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('Agg')
 import seaborn as sns
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GridSearchCV
@@ -33,7 +35,7 @@ def RFOptim(X_train, y_train):
         'max_features': [None, 'sqrt', 'log2'],
         'bootstrap': [True, False]
     }
-    random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1)
+    random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1, scoring='f1_macro')
     random_search.fit(X_train, y_train)
     print(f'Best parameters found: {random_search.best_params_}')
     print(f'Best cross-validation score: {random_search.best_score_:.4f}')
@@ -44,7 +46,7 @@ def RFBest(X_train, y_train):
 def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = RFBest(X_train, y_train)
-    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42))
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='f1_macro')
     importance = best_model.feature_importances_
     print(f'Cross-validation scores(RF): {scores}')
     print(f'Mean cross-validation score(RF): {scores.mean():.4f}')
@@ -57,6 +59,5 @@ def Validate():
     plt.gca().invert_yaxis()  # highest importance at top
     plt.xlabel('Feature Importance')
     plt.title('Random Forest Feature Importance')
-    plt.show()
+    plt.savefig('random_forest_feature_importance.png')
 # Evaluate the model
-

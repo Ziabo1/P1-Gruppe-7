@@ -36,7 +36,7 @@ def KNNOptim(X_train, y_train):
         estimator=pipeline,
         param_grid=param_grid,
         cv=10,
-        scoring='accuracy',
+        scoring='f1_macro',
         n_jobs=-1,
         verbose=0
     )
@@ -55,7 +55,7 @@ def KNNBest(X_train, y_train):
 def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = KNNBest(X_train, y_train)
-    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42))
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='f1_macro')
     print(f'Cross-validation scores(KNN): {scores}')
     print(f'Mean cross-validation score(KNN): {scores.mean():.4f}')
 
