@@ -38,7 +38,7 @@ def RFOptim(X_train, y_train):
     random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1, scoring='f1_macro')
     random_search.fit(X_train, y_train)
     print(f'Best parameters found: {random_search.best_params_}')
-    print(f'Best cross-validation score: {random_search.best_score_:.4f}')
+    print(f'Best RandomSearch score: {random_search.best_score_:.4f}')
     return random_search.best_estimator_
 def RFBest(X_train, y_train):
     rf = RFOptim(X_train, y_train)

@@ -43,7 +43,7 @@ def KNNOptim(X_train, y_train):
     X_train, X_test, y_train, y_test = Split()
     grid_search.fit(X_train, y_train)
     print(f'Best parameters found: {grid_search.best_params_}')
-    print(f'Best cross-validation score: {grid_search.best_score_:.4f}')
+    print(f'Best GridSearch score: {grid_search.best_score_:.4f}')
     return grid_search.best_estimator_
 
 # --- Return Best Model ---
