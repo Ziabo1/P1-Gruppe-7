@@ -148,7 +148,3 @@ cv_f1 = cross_val_score(best_knn, X_train_std_scal, y_train, cv=cv, scoring='f1_
 print("\n--- CROSS VALIDATION RESULTS ---")
 print(f"Mean Accuracy: {cv_acc.mean():.4f} ± {cv_acc.std():.4f}")
 print(f"Mean F1 (Macro): {cv_f1.mean():.4f} ± {cv_f1.std():.4f}")
-
-
-#Træne Random Forest model
-

@@ -95,7 +95,8 @@ plt.show()
 # Code for creating noise on the data.
 # Add ~5–10% random Gaussian noise
 noise_fraction = 0.1
-for col in ["Study_Hours_Per_Day", "Sleep_Hours_Per_Day", "Social_Hours_Per_Day", "GPA"]:
+for col in ["Study_Hours_Per_Day", "Sleep_Hours_Per_Day", "Social_Hours_Per_Day", "GPA", 
+            "Extracurricular_Hours_Per_Day", "Physical_Activity_Hours_Per_Day"]:
     std = student_dataset[col].std()
     noise = np.random.normal(0, noise_fraction * std, size=len(student_dataset))
     student_dataset[col] = (student_dataset[col] + noise).clip(lower=0)  # no negative hours
