@@ -99,11 +99,11 @@ for col in ["Study_Hours_Per_Day", "Sleep_Hours_Per_Day", "Social_Hours_Per_Day"
             "Extracurricular_Hours_Per_Day", "Physical_Activity_Hours_Per_Day"]:
     std = student_dataset[col].std()
     noise = np.random.normal(0, noise_fraction * std, size=len(student_dataset))
-    student_dataset[col] = (student_dataset[col] + noise).clip(lower=0)  # no negative hours
+    student_dataset[col] = (student_dataset[col] + noise).clip(lower=0)  
 
 
 
-flip_fraction = 0.05  # 5% of samples
+flip_fraction = 0.05  
 n = len(student_dataset)
 flip_indices = random.sample(range(n), int(flip_fraction * n))
 classes = student_dataset['Stress_Level'].unique()
