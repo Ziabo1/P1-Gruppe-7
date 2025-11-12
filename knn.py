@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 
 # --- Data Preparation ---
 def DataPrep():
-    data = pd.read_csv('student_lifestyle_dataset_modificeret.csv')
+    data = pd.read_csv('student_lifestyle_dataset_modifceret.csv')
     data.dropna(inplace=True)
     ordenc = OrdinalEncoder(categories=[['Low', 'Moderate', 'High']])
     data['Stress_Level'] = (ordenc.fit_transform(data[['Stress_Level']]) + 1).astype(int)
@@ -36,7 +36,7 @@ def KNNOptim(X_train, y_train):
         estimator=pipeline,
         param_grid=param_grid,
         cv=10,
-        scoring='f1_macro',
+        scoring='recall_macro',
         n_jobs=-1,
         verbose=0
     )
@@ -55,7 +55,7 @@ def KNNBest(X_train, y_train):
 def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = KNNBest(X_train, y_train)
-    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='f1_macro')
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='recall_macro')
     print(f'Cross-validation scores(KNN): {scores}')
     print(f'Mean cross-validation score(KNN): {scores.mean():.4f}')
 

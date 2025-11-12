@@ -10,10 +10,12 @@ matplotlib.use('Agg')
 import seaborn as sns
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import accuracy_score
+
 
 # Read data
 def DataPrep():
-    data = pd.read_csv('student_lifestyle_dataset_modificeret.csv')
+    data = pd.read_csv('student_lifestyle_dataset_modifceret.csv')
     data.dropna(inplace=True) 
     ordenc = OrdinalEncoder(categories=[['Low', 'Moderate', 'High']])
     data['Stress_Level'] = (ordenc.fit_transform(data[['Stress_Level']]) + 1).astype(int)
@@ -28,25 +30,39 @@ def Split():
 # Create and train the model
 def RFOptim(X_train, y_train):
     param = {
-        'n_estimators': [100, 200, 300, 400, 500],
-        'max_depth': [None, 10, 20, 30],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4],
+        'n_estimators': [100, 150, 175, 200, 250, 275, 300],
+        'max_depth': [None, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        'min_samples_split': [2, 5, 10, 15, 20, 25, 30, 35, 40],
+        'min_samples_leaf': [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
         'max_features': [None, 'sqrt', 'log2'],
         'bootstrap': [True, False]
     }
-    random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1, scoring='f1_macro')
+    random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1, scoring='accuracy')
     random_search.fit(X_train, y_train)
     print(f'Best parameters found: {random_search.best_params_}')
     print(f'Best RandomSearch score: {random_search.best_score_:.4f}')
-    return random_search.best_estimator_
+    bestparams = random_search.best_params_
+
+    paramgrid = {
+        'n_estimators': [bestparams['n_estimators'] - 50, bestparams['n_estimators'], bestparams['n_estimators'] + 50],
+        'max_depth': [bestparams['max_depth'] - 5 if bestparams['max_depth'] is not None else None, bestparams['max_depth'], bestparams['max_depth'] + 5 if bestparams['max_depth'] is not None else None],
+        'min_samples_split': [bestparams['min_samples_split'] - 1, bestparams['min_samples_split'], bestparams['min_samples_split'] + 1],
+        'min_samples_leaf': [bestparams['min_samples_leaf'] - 1, bestparams['min_samples_leaf'], bestparams['min_samples_leaf'] + 1],
+        'max_features': [bestparams['max_features']],
+        'bootstrap': [bestparams['bootstrap']]
+    }
+    grid_search = GridSearchCV(RandomForestClassifier(random_state=42), param_grid=paramgrid, cv=5, n_jobs=-1, scoring='accuracy', verbose=0)
+    grid_search.fit(X_train, y_train)
+    print(f'Best parameters found: {grid_search.best_params_}')
+    print(f'Best GridSearch score: {grid_search.best_score_:.4f}')
+    return grid_search.best_estimator_
 def RFBest(X_train, y_train):
     rf = RFOptim(X_train, y_train)
     return rf
 def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = RFBest(X_train, y_train)
-    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='f1_macro')
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='accuracy')
     importance = best_model.feature_importances_
     print(f'Cross-validation scores(RF): {scores}')
     print(f'Mean cross-validation score(RF): {scores.mean():.4f}')
@@ -60,4 +76,11 @@ def Validate():
     plt.xlabel('Feature Importance')
     plt.title('Random Forest Feature Importance')
     plt.savefig('random_forest_feature_importance.png')
+def Test():
+    X_train, X_test, y_train, y_test = Split()
+    finalmodel = RFBest(X_train, y_train)
+    finalmodel.fit(X_train, y_train)
+    y_pred = finalmodel.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy:", accuracy)
 # Evaluate the model
