@@ -2,7 +2,7 @@ import randomforestbest
 import knn
 
 def main():
-    randomforestbest.Validate()
+    randomforestbest.Test()
 
 
 if __name__ == "__main__":

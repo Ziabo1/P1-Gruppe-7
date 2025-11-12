@@ -10,7 +10,7 @@ matplotlib.use('Agg')
 import seaborn as sns
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 # Read data
@@ -62,7 +62,7 @@ def RFBest(X_train, y_train):
 def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = RFBest(X_train, y_train)
-    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='accuracy')
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='recall_macro')
     importance = best_model.feature_importances_
     print(f'Cross-validation scores(RF): {scores}')
     print(f'Mean cross-validation score(RF): {scores.mean():.4f}')
@@ -82,5 +82,11 @@ def Test():
     finalmodel.fit(X_train, y_train)
     y_pred = finalmodel.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
-    print("Accuracy:", accuracy)
+    f1score = f1_score(y_test, y_pred, average='macro')
+    precision = precision_score(y_test, y_pred, average='macro')
+    recall = recall_score(y_test, y_pred, average='macro')
+    print("Test F1 score:", f1score)
+    print("Test accuracy:", accuracy)
+    print("Test precision:", precision)
+    print("Test recall:", recall)
 # Evaluate the model
