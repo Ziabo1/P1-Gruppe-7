@@ -12,7 +12,7 @@ print("\n--- INFO ---")
 print(student_dataset.info())
 
 print("\n--- DESCRIPTION (NUMERIC) ---")
-print(student_dataset.describe())
+student_dataset.describe(include='all').to_csv("summary.csv")
 
 print("\n--- FIRST ROWS ---")
 print(student_dataset.head())
@@ -21,6 +21,9 @@ print("\n--- MISSING VALUES ---")
 print(student_dataset.isnull().sum())
 
 
+#Drop Studen_ID
+student_dataset = student_dataset.drop(columns=["Student_ID"])
+
 # Undersøgelse af data
 # skelne mellem numerisk og kategorisk data
 numeric_cols = student_dataset.select_dtypes(include=['int64', 'float64']).columns
@@ -28,7 +31,7 @@ categorical_cols = student_dataset.select_dtypes(include=['object']).columns
 
 # Histogrammer for numerisk data
 student_dataset[numeric_cols].hist(figsize=(12, 8), bins=20)
-plt.suptitle("Feature Distributions (Numeric)", fontsize=14)
+plt.suptitle("Feature Fordeling (Numerisk)", fontsize=14)
 plt.show()
 
 
@@ -49,11 +52,6 @@ plt.figure(figsize=(10,6))
 sns.heatmap(student_dataset[numeric_cols].corr(), annot=True, cmap="coolwarm")
 plt.title("Correlation Heatmap")
 plt.show()
-
-#dropna på student ID
-student_dataset = student_dataset.drop(columns=["Student_ID"])
-
-
 
 # Scatterplot over study hours og sleep hours med stress level plottet.
 
@@ -101,8 +99,6 @@ for col in ["Study_Hours_Per_Day", "Sleep_Hours_Per_Day", "Social_Hours_Per_Day"
     noise = np.random.normal(0, noise_fraction * std, size=len(student_dataset))
     student_dataset[col] = (student_dataset[col] + noise).clip(lower=0)  # no negative hours
 
-
-
 flip_fraction = 0.05  # 5% of samples
 n = len(student_dataset)
 flip_indices = random.sample(range(n), int(flip_fraction * n))
@@ -111,10 +107,6 @@ classes = student_dataset['Stress_Level'].unique()
 for i in flip_indices:
     current = student_dataset.loc[i, 'Stress_Level']
     student_dataset.loc[i, 'Stress_Level'] = random.choice([c for c in classes if c != current])
-
-
-
-
 
 # Pick the same numeric features as before
 x_col = "Sleep_Hours_Per_Day"
@@ -152,6 +144,6 @@ plt.tight_layout()
 plt.show()
 
 # Save the modified dataset to a new CSV file
-student_dataset.to_csv("student_lifestyle_dataset_modifceret.csv", index=False)
+# student_dataset.to_csv("student_lifestyle_dataset_modifceret.csv", index=False)
 
-print("\n--- New dataset saved as 'student_lifestyle_dataset_modified.csv' ---")
+# print("\n--- New dataset saved as 'student_lifestyle_dataset_modified.csv' ---")
