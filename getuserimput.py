@@ -11,8 +11,9 @@ def get_user_input():
     data = {}
     timer = 0
     for feature in feature_names:
-        value = float(input(f"{feature}: "))
-        timer += value
+        value = float(input(f"{feature}:"))
+        if feature != "GPA":
+            timer += value
         data[feature] = value
 
     if timer != 24:
