@@ -3,7 +3,9 @@ import joblib
 import os
 
 def get_user_input(feature_names):
-    print("Du bliver nu bedt om at uddele dit døgn, altså 24 timer, ud i 5 forskellige kategorier. Derudover bliver du spurgt om din GPA, altså karaktergennemsnit, som skal ligge mellem 0 0g 4. Indtast venligst dine data:")
+    print("Du bliver nu bedt om at uddele dit døgn, altså 24 timer, ud i 5 forskellige kategorier. " \
+    "Derudover bliver du spurgt om din GPA, altså karaktergennemsnit, som skal ligge mellem 0 0g 4. " \
+    "Indtast venligst dine data:")
 
     data = {}
     timer = 0
