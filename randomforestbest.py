@@ -96,4 +96,3 @@ def TrainAndSaveModel():
     print("Saving model to:", os.getcwd())
     joblib.dump(model, "stress_model.pkl")
     joblib.dump(X_train.columns.tolist(), "feature_names.pkl")
-# Evaluate the model
