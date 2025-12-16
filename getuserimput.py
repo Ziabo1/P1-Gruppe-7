@@ -32,4 +32,3 @@ def predict_stress():
     }
 
     print("\nForudsagt stressniveau:", stress_map[prediction])
-
