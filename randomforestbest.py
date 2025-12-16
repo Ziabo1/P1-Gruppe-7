@@ -14,7 +14,8 @@ import os
 
 # Read data
 def DataPrep():
-    data = pd.read_csv('student_lifestyle_dataset_modifceret.csv')
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    data = pd.read_csv(os.path.join(script_dir, 'student_lifestyle_dataset_modifceret.csv'))
     data.dropna(inplace=True) 
     ordenc = OrdinalEncoder(categories=[['Low', 'Moderate', 'High']])
     data['Stress_Level'] = (ordenc.fit_transform(data[['Stress_Level']]) + 1).astype(int)
