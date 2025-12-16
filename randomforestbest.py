@@ -2,16 +2,15 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score, KFold
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')
-import seaborn as sns
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
+import joblib
+import os
 
 # Read data
 def DataPrep():
@@ -33,14 +32,14 @@ def RFOptim(X_train, y_train):
         'n_estimators': [100, 150, 175, 200, 250, 275, 300],
         'max_depth': [None, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
         'min_samples_split': [2, 5, 10, 15, 20, 25, 30, 35, 40],
-        'min_samples_leaf': [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+        'min_samples_leaf': [1,  2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
         'max_features': [None, 'sqrt', 'log2'],
         'bootstrap': [True, False]
     }
     random_search = RandomizedSearchCV(RandomForestClassifier(random_state=42), param_distributions=param, n_iter=100, cv=3, verbose=0, random_state=42, n_jobs=-1, scoring='accuracy')
     random_search.fit(X_train, y_train)
-    print(f'Best parameters found: {random_search.best_params_}')
-    print(f'Best RandomSearch score: {random_search.best_score_:.4f}')
+    #print(f'Best parameters found: {random_search.best_params_}')
+    #print(f'Best RandomSearch score: {random_search.best_score_:.4f}')
     bestparams = random_search.best_params_
 
     paramgrid = {
@@ -53,8 +52,9 @@ def RFOptim(X_train, y_train):
     }
     grid_search = GridSearchCV(RandomForestClassifier(random_state=42), param_grid=paramgrid, cv=5, n_jobs=-1, scoring='accuracy', verbose=0)
     grid_search.fit(X_train, y_train)
-    print(f'Best parameters found: {grid_search.best_params_}')
-    print(f'Best GridSearch score: {grid_search.best_score_:.4f}')
+    #print(f'Best parameters found: {grid_search.bestparams}')
+    #print(f'Best GridSearch score: {grid_search.bestscore:.4f}')
+    
     return grid_search.best_estimator_
 def RFBest(X_train, y_train):
     rf = RFOptim(X_train, y_train)
@@ -62,7 +62,7 @@ def RFBest(X_train, y_train):
 def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = RFBest(X_train, y_train)
-    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='recall_macro')
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='accuracy')
     importance = best_model.feature_importances_
     print(f'Cross-validation scores(RF): {scores}')
     print(f'Mean cross-validation score(RF): {scores.mean():.4f}')
@@ -89,4 +89,11 @@ def Test():
     print("Test accuracy:", accuracy)
     print("Test precision:", precision)
     print("Test recall:", recall)
+def TrainAndSaveModel():
+    X_train, X_test, y_train, y_test = Split()
+    model = RFBest(X_train, y_train)
+    model.fit(X_train, y_train)
+    print("Saving model to:", os.getcwd())
+    joblib.dump(model, "stress_model.pkl")
+    joblib.dump(X_train.columns.tolist(), "feature_names.pkl")
 # Evaluate the model

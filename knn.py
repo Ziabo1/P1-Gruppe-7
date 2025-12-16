@@ -36,14 +36,14 @@ def KNNOptim(X_train, y_train):
         estimator=pipeline,
         param_grid=param_grid,
         cv=10,
-        scoring='recall_macro',
+        scoring='accuracy',
         n_jobs=-1,
         verbose=0
     )
     X_train, X_test, y_train, y_test = Split()
     grid_search.fit(X_train, y_train)
-    print(f'Best parameters found: {grid_search.best_params_}')
-    print(f'Best GridSearch score: {grid_search.best_score_:.4f}')
+    #print(f'Best parameters found: {grid_search.best_params_}')
+    #print(f'Best GridSearch score: {grid_search.best_score_:.4f}')
     return grid_search.best_estimator_
 
 # --- Return Best Model ---
@@ -55,7 +55,7 @@ def KNNBest(X_train, y_train):
 def Validate():
     X_train, X_test, y_train, y_test = Split()
     best_model = KNNBest(X_train, y_train)
-    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='recall_macro')
+    scores = cross_val_score(best_model, X_train, y_train, cv=KFold(n_splits=10, shuffle=True, random_state=42), scoring='precision_macro')
     print(f'Cross-validation scores(KNN): {scores}')
     print(f'Mean cross-validation score(KNN): {scores.mean():.4f}')
 
