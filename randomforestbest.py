@@ -15,7 +15,7 @@ import os
 # Read data
 def DataPrep():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    data = pd.read_csv(os.path.join(script_dir, 'student_lifestyle_dataset_modifceret.csv'))
+    data = pd.read_csv(os.path.join(script_dir, 'student_lifestyle_dataset_modificeret.csv'))
     data.dropna(inplace=True) 
     ordenc = OrdinalEncoder(categories=[['Low', 'Moderate', 'High']])
     data['Stress_Level'] = (ordenc.fit_transform(data[['Stress_Level']]) + 1).astype(int)
@@ -94,6 +94,9 @@ def TrainAndSaveModel():
     X_train, X_test, y_train, y_test = Split()
     model = RFBest(X_train, y_train)
     model.fit(X_train, y_train)
-    print("Saving model to:", os.getcwd())
-    joblib.dump(model, "stress_model.pkl")
-    joblib.dump(X_train.columns.tolist(), "feature_names.pkl")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(script_dir, "stress_model.pkl")
+    features_path = os.path.join(script_dir, "feature_names.pkl")
+    print("Saving model to:", script_dir)
+    joblib.dump(model, model_path)
+    joblib.dump(X_train.columns.tolist(), features_path)
